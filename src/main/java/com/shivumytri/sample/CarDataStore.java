@@ -27,7 +27,7 @@ import java.util.TimeZone;
 
 public class CarDataStore {
 
-	// Data accessors
+	
 	public Map<String, Object> getCar(final int id) {
 		Map<String, Object> data = null;
 

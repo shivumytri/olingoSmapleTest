@@ -44,108 +44,110 @@ import org.apache.olingo.odata2.api.uri.info.GetEntityUriInfo;
 
 public class CarODataSingleProcessor extends ODataSingleProcessor {
 
-  private final CarDataStore dataStore;
+	private final CarDataStore dataStore;
 
-  public CarODataSingleProcessor() {
-    dataStore = new CarDataStore();
-  }
+	public CarODataSingleProcessor() {
+		dataStore = new CarDataStore();
+	}
 
-  @Override
-  public ODataResponse readEntitySet(final GetEntitySetUriInfo uriInfo, final String contentType) 
-      throws ODataException {
+	@Override
+	public ODataResponse readEntitySet(final GetEntitySetUriInfo uriInfo, final String contentType)
+			throws ODataException {
 
-    EdmEntitySet entitySet;
+		EdmEntitySet entitySet;
 
-    if (uriInfo.getNavigationSegments().size() == 0) {
-      entitySet = uriInfo.getStartEntitySet();
+		if (uriInfo.getNavigationSegments().size() == 0) {
+			entitySet = uriInfo.getStartEntitySet();
 
-      if (ENTITY_SET_NAME_CARS.equals(entitySet.getName())) {
-        return EntityProvider.writeFeed(contentType, entitySet, dataStore.getCars(),
-            EntityProviderWriteProperties.serviceRoot(getContext().getPathInfo().getServiceRoot()).build());
-      } else if (ENTITY_SET_NAME_MANUFACTURERS.equals(entitySet.getName())) {
-        return EntityProvider.writeFeed(contentType, entitySet, dataStore.getManufacturers(),
-            EntityProviderWriteProperties.serviceRoot(getContext().getPathInfo().getServiceRoot()).build());
-      }
+			if (ENTITY_SET_NAME_CARS.equals(entitySet.getName())) {
+				return EntityProvider.writeFeed(contentType, entitySet, dataStore.getCars(),
+						EntityProviderWriteProperties.serviceRoot(getContext().getPathInfo().getServiceRoot()).build());
+			} else if (ENTITY_SET_NAME_MANUFACTURERS.equals(entitySet.getName())) {
+				return EntityProvider.writeFeed(contentType, entitySet, dataStore.getManufacturers(),
+						EntityProviderWriteProperties.serviceRoot(getContext().getPathInfo().getServiceRoot()).build());
+			}
 
-      throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
+			throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
 
-    } else if (uriInfo.getNavigationSegments().size() == 1) {
-      // navigation first level, simplified example for illustration purposes only
-      entitySet = uriInfo.getTargetEntitySet();
+		} else if (uriInfo.getNavigationSegments().size() == 1) {
+			// navigation first level, simplified example for illustration
+			// purposes only
+			entitySet = uriInfo.getTargetEntitySet();
 
-      if (ENTITY_SET_NAME_CARS.equals(entitySet.getName())) {
-        int manufacturerKey = getKeyValue(uriInfo.getKeyPredicates().get(0));
+			if (ENTITY_SET_NAME_CARS.equals(entitySet.getName())) {
+				int manufacturerKey = getKeyValue(uriInfo.getKeyPredicates().get(0));
 
-        List<Map<String, Object>> cars = new ArrayList<Map<String, Object>>();
-        cars.addAll(dataStore.getCarsFor(manufacturerKey));
+				List<Map<String, Object>> cars = new ArrayList<Map<String, Object>>();
+				cars.addAll(dataStore.getCarsFor(manufacturerKey));
 
-        return EntityProvider.writeFeed(contentType, entitySet, cars, EntityProviderWriteProperties.serviceRoot(
-            getContext().getPathInfo().getServiceRoot()).build());
-      }
+				return EntityProvider.writeFeed(contentType, entitySet, cars,
+						EntityProviderWriteProperties.serviceRoot(getContext().getPathInfo().getServiceRoot()).build());
+			}
 
-      throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
-    }
+			throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
+		}
 
-    throw new ODataNotImplementedException();
-  }
+		throw new ODataNotImplementedException();
+	}
 
-  @Override
-  public ODataResponse readEntity(final GetEntityUriInfo uriInfo, final String contentType) throws ODataException {
+	@Override
+	public ODataResponse readEntity(final GetEntityUriInfo uriInfo, final String contentType) throws ODataException {
 
-    if (uriInfo.getNavigationSegments().size() == 0) {
-      EdmEntitySet entitySet = uriInfo.getStartEntitySet();
+		if (uriInfo.getNavigationSegments().size() == 0) {
+			EdmEntitySet entitySet = uriInfo.getStartEntitySet();
 
-      if (ENTITY_SET_NAME_CARS.equals(entitySet.getName())) {
-        int id = getKeyValue(uriInfo.getKeyPredicates().get(0));
-        Map<String, Object> data = dataStore.getCar(id);
+			if (ENTITY_SET_NAME_CARS.equals(entitySet.getName())) {
+				int id = getKeyValue(uriInfo.getKeyPredicates().get(0));
+				Map<String, Object> data = dataStore.getCar(id);
 
-        if (data != null) {
-          URI serviceRoot = getContext().getPathInfo().getServiceRoot();
-          ODataEntityProviderPropertiesBuilder propertiesBuilder =
-              EntityProviderWriteProperties.serviceRoot(serviceRoot);
+				if (data != null) {
+					URI serviceRoot = getContext().getPathInfo().getServiceRoot();
+					ODataEntityProviderPropertiesBuilder propertiesBuilder = EntityProviderWriteProperties
+							.serviceRoot(serviceRoot);
 
-          return EntityProvider.writeEntry(contentType, entitySet, data, propertiesBuilder.build());
-        }
-      } else if (ENTITY_SET_NAME_MANUFACTURERS.equals(entitySet.getName())) {
-        int id = getKeyValue(uriInfo.getKeyPredicates().get(0));
-        Map<String, Object> data = dataStore.getManufacturer(id);
+					return EntityProvider.writeEntry(contentType, entitySet, data, propertiesBuilder.build());
+				}
+			} else if (ENTITY_SET_NAME_MANUFACTURERS.equals(entitySet.getName())) {
+				int id = getKeyValue(uriInfo.getKeyPredicates().get(0));
+				Map<String, Object> data = dataStore.getManufacturer(id);
 
-        if (data != null) {
-          URI serviceRoot = getContext().getPathInfo().getServiceRoot();
-          ODataEntityProviderPropertiesBuilder propertiesBuilder =
-              EntityProviderWriteProperties.serviceRoot(serviceRoot);
+				if (data != null) {
+					URI serviceRoot = getContext().getPathInfo().getServiceRoot();
+					ODataEntityProviderPropertiesBuilder propertiesBuilder = EntityProviderWriteProperties
+							.serviceRoot(serviceRoot);
 
-          return EntityProvider.writeEntry(contentType, entitySet, data, propertiesBuilder.build());
-        }
-      }
+					return EntityProvider.writeEntry(contentType, entitySet, data, propertiesBuilder.build());
+				}
+			}
 
-      throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
+			throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
 
-    } else if (uriInfo.getNavigationSegments().size() == 1) {
-      // navigation first level, simplified example for illustration purposes only
-      EdmEntitySet entitySet = uriInfo.getTargetEntitySet();
+		} else if (uriInfo.getNavigationSegments().size() == 1) {
+			// navigation first level, simplified example for illustration
+			// purposes only
+			EdmEntitySet entitySet = uriInfo.getTargetEntitySet();
 
-      Map<String, Object> data = null;
+			Map<String, Object> data = null;
 
-      if (ENTITY_SET_NAME_MANUFACTURERS.equals(entitySet.getName())) {
-        int carKey = getKeyValue(uriInfo.getKeyPredicates().get(0));
-        data = dataStore.getManufacturerFor(carKey);
-      }
+			if (ENTITY_SET_NAME_MANUFACTURERS.equals(entitySet.getName())) {
+				int carKey = getKeyValue(uriInfo.getKeyPredicates().get(0));
+				data = dataStore.getManufacturerFor(carKey);
+			}
 
-      if (data != null) {
-        return EntityProvider.writeEntry(contentType, uriInfo.getTargetEntitySet(),
-            data, EntityProviderWriteProperties.serviceRoot(getContext().getPathInfo().getServiceRoot()).build());
-      }
+			if (data != null) {
+				return EntityProvider.writeEntry(contentType, uriInfo.getTargetEntitySet(), data,
+						EntityProviderWriteProperties.serviceRoot(getContext().getPathInfo().getServiceRoot()).build());
+			}
 
-      throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
-    }
+			throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
+		}
 
-    throw new ODataNotImplementedException();
-  }
+		throw new ODataNotImplementedException();
+	}
 
-  private int getKeyValue(final KeyPredicate key) throws ODataException {
-    EdmProperty property = key.getProperty();
-    EdmSimpleType type = (EdmSimpleType) property.getType();
-    return type.valueOfString(key.getLiteral(), EdmLiteralKind.DEFAULT, property.getFacets(), Integer.class);
-  }
+	private int getKeyValue(final KeyPredicate key) throws ODataException {
+		EdmProperty property = key.getProperty();
+		EdmSimpleType type = (EdmSimpleType) property.getType();
+		return type.valueOfString(key.getLiteral(), EdmLiteralKind.DEFAULT, property.getFacets(), Integer.class);
+	}
 }

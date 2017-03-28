@@ -27,13 +27,13 @@ import org.apache.olingo.odata2.api.processor.ODataSingleProcessor;
 
 public class CarServiceFactory extends ODataServiceFactory {
 
-  @Override
-  public ODataService createService(final ODataContext ctx) throws ODataException {
+	@Override
+	public ODataService createService(final ODataContext ctx) throws ODataException {
 
-    EdmProvider edmProvider = new CarEdmProvider();
+		EdmProvider edmProvider = new CarEdmProvider();
 
-    ODataSingleProcessor singleProcessor = new CarODataSingleProcessor();
+		ODataSingleProcessor singleProcessor = new CarODataSingleProcessor();
 
-    return createODataSingleProcessorService(edmProvider, singleProcessor);
-  }
+		return createODataSingleProcessorService(edmProvider, singleProcessor);
+	}
 }
